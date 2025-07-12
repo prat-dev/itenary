@@ -1,6 +1,7 @@
 'use client';
 
 import type { DragEventHandler } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import type { Activity } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,6 +17,16 @@ type ActivityCardProps = {
 
 export default function ActivityCard({ activity, draggable, onDragStart }: ActivityCardProps) {
   const aiHint = activity.name.toLowerCase().split(' ').slice(0, 2).join(' ');
+  const [photoUrl, setPhotoUrl] = useState(activity.photo);
+
+  useEffect(() => {
+    // To avoid hydration errors, we ensure random placeholders are generated only on the client.
+    if (activity.photo.includes('placehold.co')) {
+      const random = Math.floor(Math.random() * 100);
+      setPhotoUrl(`https://placehold.co/400x400.png?id=${random}`);
+    }
+  }, [activity.photo]);
+
   return (
     <Card
       className="group transition-all duration-300 ease-in-out hover:shadow-md"
@@ -24,7 +35,7 @@ export default function ActivityCard({ activity, draggable, onDragStart }: Activ
     >
       <CardContent className="p-3 flex items-start gap-4">
         <Image
-          src={activity.photo}
+          src={photoUrl}
           alt={activity.name}
           width={120}
           height={120}
