@@ -15,6 +15,7 @@ type ActivityCardProps = {
 };
 
 export default function ActivityCard({ activity, draggable, onDragStart }: ActivityCardProps) {
+  const aiHint = activity.name.toLowerCase().split(' ').slice(0, 2).join(' ');
   return (
     <Card
       className="group transition-all duration-300 ease-in-out hover:shadow-md"
@@ -28,7 +29,7 @@ export default function ActivityCard({ activity, draggable, onDragStart }: Activ
           width={120}
           height={120}
           className="rounded-md object-cover aspect-square"
-          data-ai-hint="travel activity"
+          data-ai-hint={aiHint}
         />
         <div className="flex-1">
           <h3 className="font-semibold text-base">{activity.name}</h3>

@@ -7,8 +7,8 @@ import AppHeader from '@/components/app-header';
 import ItinerarySidebar from '@/components/itinerary/itinerary-sidebar';
 import ItineraryBuilder from '@/components/itinerary/itinerary-builder';
 import MapView from '@/components/map/map-view';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plane } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Plane, Plus } from 'lucide-react';
 import MapAPIProvider from '@/components/map/api-provider';
 
 export default function Home() {
@@ -55,13 +55,17 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div className="flex h-full items-center justify-center rounded-lg border-dashed border-2">
-              <div className="text-center">
-                <Plane className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h2 className="mt-4 text-2xl font-semibold text-foreground">Welcome to RoamFlow</h2>
-                <p className="mt-2 text-muted-foreground">
-                  Select an itinerary to start planning or create a new one.
+             <div className="flex h-full items-center justify-center rounded-lg bg-cover bg-center" style={{backgroundImage: 'url(https://placehold.co/1200x800.png)'}} data-ai-hint="travel destination">
+              <div className="text-center bg-background/80 backdrop-blur-sm p-8 rounded-lg shadow-lg">
+                <Plane className="mx-auto h-12 w-12 text-primary" />
+                <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground">Welcome to RoamFlow</h2>
+                <p className="mt-2 text-muted-foreground max-w-md">
+                  Your intelligent travel planner. Select an itinerary to start or create a new adventure.
                 </p>
+                <Button className="mt-6">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Itinerary
+                </Button>
               </div>
             </div>
           )}
