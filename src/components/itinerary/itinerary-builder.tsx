@@ -13,10 +13,10 @@ import DestinationSuggester from './destination-suggester';
 
 type ItineraryBuilderProps = {
   itinerary: Itinerary;
-  setItinerary: (itinerary: Itinerary) => void;
+  onUpdateItinerary: (itinerary: Itinerary) => void;
 };
 
-export default function ItineraryBuilder({ itinerary, setItinerary }: ItineraryBuilderProps) {
+export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: ItineraryBuilderProps) {
   const [draggedActivity, setDraggedActivity] = useState<{ destId: string; actId: string } | null>(null);
 
   const handleDragStart = (e: DragEvent<HTMLDivElement>, destId: string, actId: string) => {
@@ -46,7 +46,7 @@ export default function ItineraryBuilder({ itinerary, setItinerary }: ItineraryB
     const targetActivityIndex = targetDest.activities.findIndex((a: Activity) => a.id === targetActId);
     targetDest.activities.splice(targetActivityIndex, 0, removedActivity);
 
-    setItinerary(newItinerary);
+    onUpdateItinerary(newItinerary);
     setDraggedActivity(null);
   };
   
@@ -58,7 +58,7 @@ export default function ItineraryBuilder({ itinerary, setItinerary }: ItineraryB
       location: { lat: 0, lng: 0 }, // Placeholder location
     }));
 
-    setItinerary({
+    onUpdateItinerary({
       ...itinerary,
       destinations: [...itinerary.destinations, ...newDestinations],
     });

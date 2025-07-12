@@ -24,6 +24,18 @@ export default function Home() {
       prev.map(it => (it.id === updatedItinerary.id ? updatedItinerary : it))
     );
   };
+  
+  const handleCreateNewItinerary = () => {
+    const newItinerary: Itinerary = {
+      id: `itinerary-${Date.now()}`,
+      name: 'Untitled Itinerary',
+      tripType: 'leisure',
+      destinations: [],
+      isFavorite: false,
+    };
+    setItineraries(prev => [...prev, newItinerary]);
+    setSelectedItineraryId(newItinerary.id);
+  };
 
   const handleSelectItinerary = (id: string) => {
     setSelectedItineraryId(id);
@@ -31,7 +43,7 @@ export default function Home() {
 
   return (
     <div className="flex h-dvh w-full flex-col">
-      <AppHeader />
+      <AppHeader onCreateNew={handleCreateNewItinerary} />
       <div className="flex flex-1 overflow-hidden">
         <ItinerarySidebar
           itineraries={itineraries}
@@ -45,7 +57,7 @@ export default function Home() {
                 <ItineraryBuilder
                   key={selectedItinerary.id}
                   itinerary={selectedItinerary}
-                  setItinerary={handleUpdateItinerary}
+                  onUpdateItinerary={handleUpdateItinerary}
                 />
               </div>
               <div className="xl:col-span-2 h-full flex flex-col">
@@ -62,7 +74,7 @@ export default function Home() {
                 <p className="mt-2 text-muted-foreground max-w-md">
                   Your intelligent travel planner. Select an itinerary to start or create a new adventure.
                 </p>
-                <Button className="mt-6">
+                <Button className="mt-6" onClick={handleCreateNewItinerary}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Itinerary
                 </Button>

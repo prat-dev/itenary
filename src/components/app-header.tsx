@@ -4,7 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PlusCircle, Search } from 'lucide-react';
 import { Input } from './ui/input';
 
-export default function AppHeader() {
+type AppHeaderProps = {
+    onCreateNew: () => void;
+}
+
+export default function AppHeader({ onCreateNew }: AppHeaderProps) {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-card px-4 sm:px-6 lg:px-8">
       <div className="flex items-center gap-4">
@@ -18,7 +22,7 @@ export default function AppHeader() {
         <Button variant="ghost" size="icon" className="md:hidden">
           <Search className="h-5 w-5" />
         </Button>
-        <Button className="bg-accent hover:bg-accent/90 text-accent-foreground hidden sm:flex">
+        <Button onClick={onCreateNew} className="bg-accent hover:bg-accent/90 text-accent-foreground hidden sm:flex">
           <PlusCircle className="mr-2 h-4 w-4" />
           New Itinerary
         </Button>
