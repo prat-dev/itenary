@@ -33,7 +33,14 @@ const prompt = ai.definePrompt({
   name: 'importDestinationsPrompt',
   input: {schema: ImportDestinationsInputSchema},
   output: {schema: ImportDestinationsOutputSchema},
-  prompt: `You are a travel expert. Extract the destinations from the following text. Return a JSON array of strings. Each string should be a travel destination. Do not include any other information.
+  prompt: `You are a travel expert. Extract the destinations from the following text. 
+  
+Return the data as a JSON object that adheres to the following schema:
+{
+  "destinations": ["destination1", "destination2", ...]
+}
+
+Do not include any other information or formatting.
 
 Text: {{{text}}}`,
 });

@@ -31,7 +31,7 @@ export default function DestinationImporter({ onImport, children }: DestinationI
     startTransition(async () => {
       try {
         const result = await importDestinations({ text });
-        if (result && result.destinations.length > 0) {
+        if (result && result.destinations && result.destinations.length > 0) {
           onImport(result.destinations);
           toast({
             title: 'Success!',
@@ -42,17 +42,24 @@ export default function DestinationImporter({ onImport, children }: DestinationI
         } else {
             toast({
                 title: 'No destinations found',
-                description: 'We couldn\'t find any destinations in the text you provided.',
+                description: "We couldn't find any destinations in the text you provided. Please check the format and try again.",
                 variant: 'destructive',
             });
         }
       } catch (error) {
+        console.error('Import Error:', error);
+        let errorMessage = 'An unexpected error occurred. Please try again.';
+        if (error instanceof Error) {
+            errorMessage = error.message.includes('JSON') 
+                ? 'The AI returned an invalid format. Please try again.' 
+                : error.message;
+        }
+        
         toast({
-          title: 'Error importing destinations',
-          description: 'An unexpected error occurred. Please try again.',
+          title: 'Error Importing Destinations',
+          description: errorMessage,
           variant: 'destructive',
         });
-        console.error(error);
       }
     });
   };
