@@ -10,6 +10,7 @@ import ActivityCard from './activity-card';
 import { FileUp, Lightbulb, Plus, Trash2 } from 'lucide-react';
 import DestinationImporter from './destination-importer';
 import DestinationSuggester from './destination-suggester';
+import AddActivityDialog from './add-activity-dialog';
 
 type ItineraryBuilderProps = {
   itinerary: Itinerary;
@@ -63,6 +64,28 @@ export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: Itine
       destinations: [...itinerary.destinations, ...newDestinations],
     });
   };
+
+  const handleAddActivity = (destinationId: string, activity: Omit<Activity, 'id' | 'date'>) => {
+    const newActivity: Activity = {
+      ...activity,
+      id: `act-${Date.now()}`,
+      date: new Date().toISOString(),
+    };
+
+    const newItinerary = {
+      ...itinerary,
+      destinations: itinerary.destinations.map(dest => {
+        if (dest.id === destinationId) {
+          return {
+            ...dest,
+            activities: [...dest.activities, newActivity],
+          };
+        }
+        return dest;
+      }),
+    };
+    onUpdateItinerary(newItinerary);
+  };
   
   return (
     <Card className="h-full flex flex-col">
@@ -110,14 +133,24 @@ export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: Itine
                   ) : (
                     <div className="text-center text-muted-foreground p-4 border-2 border-dashed rounded-lg">
                       <p>No activities yet.</p>
-                      <Button variant="link" className="mt-2">
-                        <Plus className="mr-2 h-4 w-4" /> Add Activity
-                      </Button>
+                       <AddActivityDialog
+                        destination={destination}
+                        onAddActivity={handleAddActivity}
+                      >
+                        <Button variant="link" className="mt-2">
+                          <Plus className="mr-2 h-4 w-4" /> Add Activity
+                        </Button>
+                      </AddActivityDialog>
                     </div>
                   )}
-                   <Button variant="outline" size="sm" className="w-full mt-4">
+                  <AddActivityDialog
+                    destination={destination}
+                    onAddActivity={handleAddActivity}
+                  >
+                    <Button variant="outline" size="sm" className="w-full mt-4">
                       <Plus className="mr-2 h-4 w-4" /> Add Activity to {destination.name}
                     </Button>
+                  </AddActivityDialog>
                 </div>
               </AccordionContent>
             </AccordionItem>

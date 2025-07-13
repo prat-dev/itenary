@@ -16,16 +16,14 @@ type ActivityCardProps = {
 };
 
 export default function ActivityCard({ activity, draggable, onDragStart }: ActivityCardProps) {
+  // Use activity name as a hint for Unsplash search
   const aiHint = activity.name.toLowerCase().split(' ').slice(0, 2).join(' ');
   const [photoUrl, setPhotoUrl] = useState(activity.photo);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // To avoid hydration errors, we ensure random placeholders are generated only on the client.
-    if (activity.photo.includes('placehold.co')) {
-      const random = Math.floor(Math.random() * 100);
-      setPhotoUrl(`https://placehold.co/400x400.png?id=${random}`);
-    }
-  }, [activity.photo]);
+    setIsClient(true);
+  }, []);
 
   return (
     <Card
@@ -34,14 +32,18 @@ export default function ActivityCard({ activity, draggable, onDragStart }: Activ
       onDragStart={onDragStart}
     >
       <CardContent className="p-3 flex items-start gap-4">
-        <Image
-          src={photoUrl}
-          alt={activity.name}
-          width={120}
-          height={120}
-          className="rounded-md object-cover aspect-square"
-          data-ai-hint={aiHint}
-        />
+        {isClient ? (
+          <Image
+            src={`${activity.photo}?id=${activity.id}`}
+            alt={activity.name}
+            width={120}
+            height={120}
+            className="rounded-md object-cover aspect-square"
+            data-ai-hint={aiHint}
+          />
+        ) : (
+          <div className="w-[120px] h-[120px] bg-muted rounded-md" />
+        )}
         <div className="flex-1">
           <h3 className="font-semibold text-base">{activity.name}</h3>
           <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>
