@@ -1,7 +1,7 @@
 'use client';
 
 import type { DragEvent } from 'react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import type { Itinerary, Destination, Activity } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,6 +11,8 @@ import { FileUp, Lightbulb, Plus, Trash2 } from 'lucide-react';
 import DestinationImporter from './destination-importer';
 import DestinationSuggester from './destination-suggester';
 import AddActivityDialog from './add-activity-dialog';
+import { geocodeDestination } from '@/ai/flows/geocode-destination';
+import { useToast } from '@/hooks/use-toast';
 
 type ItineraryBuilderProps = {
   itinerary: Itinerary;
@@ -19,6 +21,9 @@ type ItineraryBuilderProps = {
 
 export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: ItineraryBuilderProps) {
   const [draggedActivity, setDraggedActivity] = useState<{ destId: string; actId: string } | null>(null);
+  const [isGeocoding, startGeocodingTransition] = useTransition();
+  const { toast } = useToast();
+
 
   const handleDragStart = (e: DragEvent<HTMLDivElement>, destId: string, actId: string) => {
     setDraggedActivity({ destId, actId });
@@ -52,16 +57,31 @@ export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: Itine
   };
   
   const handleAddDestination = (destinations: string[]) => {
-    const newDestinations: Destination[] = destinations.map((name, index) => ({
-      id: `new-dest-${Date.now()}-${index}`,
-      name,
-      activities: [],
-      location: { lat: 0, lng: 0 }, // Placeholder location
-    }));
-
-    onUpdateItinerary({
-      ...itinerary,
-      destinations: [...itinerary.destinations, ...newDestinations],
+    startGeocodingTransition(async () => {
+      try {
+        const newDestinations: Destination[] = await Promise.all(
+          destinations.map(async (name, index) => {
+            const location = await geocodeDestination({ name });
+            return {
+              id: `new-dest-${Date.now()}-${index}`,
+              name,
+              activities: [],
+              location,
+            };
+          })
+        );
+        onUpdateItinerary({
+          ...itinerary,
+          destinations: [...itinerary.destinations, ...newDestinations],
+        });
+      } catch(error) {
+        console.error("Error geocoding destinations:", error);
+        toast({
+            title: 'Error Adding Destinations',
+            description: 'Could not find location data for one or more destinations. Please be more specific.',
+            variant: 'destructive',
+        });
+      }
     });
   };
 
@@ -95,13 +115,13 @@ export default function ItineraryBuilder({ itinerary, onUpdateItinerary }: Itine
           <CardDescription>Plan your {itinerary.tripType} trip.</CardDescription>
         </div>
          <div className="flex gap-2">
-            <DestinationImporter onImport={handleAddDestination}>
-              <Button variant="outline">
+            <DestinationImporter onImport={handleAddDestination} isGeocoding={isGeocoding}>
+              <Button variant="outline" disabled={isGeocoding}>
                 <FileUp className="mr-2 h-4 w-4" /> Import
               </Button>
             </DestinationImporter>
             <DestinationSuggester itinerary={itinerary} onSuggest={handleAddDestination}>
-              <Button variant="outline">
+              <Button variant="outline" disabled={isGeocoding}>
                 <Lightbulb className="mr-2 h-4 w-4" /> Suggest
               </Button>
             </DestinationSuggester>

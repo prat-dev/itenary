@@ -19,23 +19,24 @@ import { Loader2 } from 'lucide-react';
 type DestinationImporterProps = {
   onImport: (destinations: string[]) => void;
   children: React.ReactNode;
+  isGeocoding: boolean;
 };
 
-export default function DestinationImporter({ onImport, children }: DestinationImporterProps) {
+export default function DestinationImporter({ onImport, children, isGeocoding }: DestinationImporterProps) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const [isParsing, startParsingTransition] = useTransition();
   const { toast } = useToast();
 
   const handleImport = () => {
-    startTransition(async () => {
+    startParsingTransition(async () => {
       try {
         const result = await importDestinations({ text });
         if (result && result.destinations && result.destinations.length > 0) {
           onImport(result.destinations);
           toast({
-            title: 'Success!',
-            description: `${result.destinations.length} destinations have been imported.`,
+            title: 'Importing...',
+            description: `Now finding locations for ${result.destinations.length} destinations.`,
           });
           setOpen(false);
           setText('');
@@ -64,6 +65,8 @@ export default function DestinationImporter({ onImport, children }: DestinationI
     });
   };
 
+  const isPending = isParsing || isGeocoding;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -86,7 +89,7 @@ export default function DestinationImporter({ onImport, children }: DestinationI
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleImport} disabled={isPending || !text.trim()}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Import
+            {isGeocoding ? 'Finding Locations...' : isParsing ? 'Parsing...' : 'Import'}
           </Button>
         </DialogFooter>
       </DialogContent>
