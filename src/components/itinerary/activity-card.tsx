@@ -18,7 +18,6 @@ type ActivityCardProps = {
 export default function ActivityCard({ activity, draggable, onDragStart }: ActivityCardProps) {
   // Use activity name as a hint for Unsplash search
   const aiHint = activity.name.toLowerCase().split(' ').slice(0, 2).join(' ');
-  const [photoUrl, setPhotoUrl] = useState(activity.photo);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function ActivityCard({ activity, draggable, onDragStart }: Activ
       <CardContent className="p-3 flex items-start gap-4">
         {isClient ? (
           <Image
-            src={`${activity.photo}?id=${activity.id}`}
+            src={activity.photo}
             alt={activity.name}
             width={120}
             height={120}
